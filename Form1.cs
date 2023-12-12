@@ -1,3 +1,5 @@
+using LibVLCSharp.Shared;
+
 namespace RandomRestTimer
 {
     public partial class Form1 : Form
@@ -26,6 +28,11 @@ namespace RandomRestTimer
         /// Duration to rest for each rest time
         /// </summary>
         private List<int> chillTimes = new List<int>();
+
+        private static LibVLC vlc = new LibVLC("--input-repeat=0");
+        private static Media media = new Media(vlc, new Uri(AppDomain.CurrentDomain.BaseDirectory + "/Assets/Siren_Cut.mp3"));
+        private static MediaPlayer mediaPlayer = new MediaPlayer(media);
+        
 
         public Form1()
         {
@@ -162,6 +169,7 @@ namespace RandomRestTimer
         {
             if (totalTimeLeft <= 0)
             {
+                mediaPlayer.Play();
                 tmrChillTimer.Stop();
                 Reset();
                 return;
@@ -184,6 +192,7 @@ namespace RandomRestTimer
                     }
                     if (timeLeft <= 0)
                     {
+                        mediaPlayer.Play();
                         tmrChillTimer.Stop();
                         timeToRestIndex = 0;
                         timeLeft = restTimes[timeToRestIndex++];
@@ -198,6 +207,7 @@ namespace RandomRestTimer
                     totalTimeLeft--;
                     if (totalTimeLeft <= 0)
                     {
+                        mediaPlayer.Play();
                         tmrChillTimer.Stop();
                         intervalTimeLeft -= timeLeft;
                         totalTimeLeft -= timeLeft;
@@ -209,6 +219,7 @@ namespace RandomRestTimer
                     }
                     else if (timeLeft <= 0)
                     {
+                        mediaPlayer.Play();
                         tmrChillTimer.Stop();
                         currentState = State.RANDOM_REST;
                         timeLeft = chillTimes[chillTimeIndex++];
@@ -221,6 +232,7 @@ namespace RandomRestTimer
                     totalTimeLeft--;
                     if (timeLeft <= 0)
                     {
+                        mediaPlayer.Play();
                         tmrChillTimer.Stop();
                         intervalTimeLeft -= timeLeft;
                         totalTimeLeft -= timeLeft;
@@ -235,12 +247,6 @@ namespace RandomRestTimer
             lblIntervalTimeLeft.Text = SecondsToTimeString(intervalTimeLeft);
             lblTotalTimeLeft.Text = SecondsToTimeString(totalTimeLeft);
             lblCurrentTime.Text = SecondsToTimeString(timeLeft);
-
-            if (timeLeft <= 0)
-            {
-                timeLeft = 0;
-                tmrChillTimer.Stop();
-            }
         }
 
         private static string SecondsToTimeString(int seconds)
